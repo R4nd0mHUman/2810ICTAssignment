@@ -1,3 +1,63 @@
+import csv
+
+
+def load_total_consumption(file_path):
+    """
+    Read household electricity usage from a CSV file and return the total electricity consumption in kWh.
+
+    The CSV file must contain:
+        - timestamp
+        - kWh
+
+    Parameters:
+        - file_path (str): Path to the electricity usage CSV file.
+
+    Returns:
+        - float: Total electricity consumption in kWh.
+
+    Raises:
+        - ValueError: If the required columns are missing.
+        - ValueError: If a kWh value is not a valid number.
+        - ValueError: If a kWh value is negative.
+        - ValueError: If the file contains no usage records.
+    """
+
+    total_consumption = 0.0
+    record_count = 0
+
+    with open(file_path, "r", newline="", encoding="utf-8-sig") as file:
+        reader = csv.DictReader(file)
+
+        # Check that the CSV has a header row.
+        if reader.fieldnames is None:
+            raise ValueError("CSV file is empty or has no header row.")
+
+        required_columns = {"timestamp", "kWh"}
+
+        # Check that the required columns exist.
+        if not required_columns.issubset(reader.fieldnames):
+            raise ValueError("CSV file must contain 'timestamp' and 'kWh' columns.")
+
+        # Read each electricity usage record.
+        for row in reader:
+            try:
+                consumption = float(row["kWh"])
+            except (TypeError, ValueError):
+                raise ValueError("All kWh values must be valid numbers.")
+
+            if consumption < 0:
+                raise ValueError("Electricity consumption in the CSV cannot be negative.")
+
+            total_consumption += consumption
+            record_count += 1
+
+    # Make sure the CSV actually contained usage data.
+    if record_count == 0:
+        raise ValueError("CSV file contains no electricity usage records.")
+
+    return round(total_consumption, 2)
+
+
 def calculate_flat_rate(consumption, rate, fixed_fee=0):
     """
     Calculate an electricity bill using a flat rate tariff.
