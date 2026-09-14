@@ -501,3 +501,42 @@ def test_tiered_tariff_with_provided_dataset():
     )
 
     assert result == 310.27
+    
+def test_missing_column_full_length():
+    """
+    Negative test: A full-length (720-row) file with the wrong
+    column name ('usage' instead of 'kWh') should still be rejected.
+    """
+    csv_file = Path(__file__).parent / "missing_column_full.csv"
+    with pytest.raises(ValueError):
+        load_total_consumption(csv_file)
+
+
+def test_invalid_kwh_full_length():
+    """
+    Negative test: A full-length file with one non-numeric kWh
+    value buried partway through should still be rejected.
+    """
+    csv_file = Path(__file__).parent / "invalid_kwh_full.csv"
+    with pytest.raises(ValueError):
+        load_total_consumption(csv_file)
+
+
+def test_negative_kwh_full_length():
+    """
+    Negative test: A full-length file with one negative kWh
+    value buried partway through should still be rejected.
+    """
+    csv_file = Path(__file__).parent / "negative_kwh_full.csv"
+    with pytest.raises(ValueError):
+        load_total_consumption(csv_file)
+
+
+def test_no_records_rejected():
+    """
+    Negative test: A CSV with headers but zero usage records
+    should be rejected.
+    """
+    csv_file = Path(__file__).parent / "no_records.csv"
+    with pytest.raises(ValueError):
+        load_total_consumption(csv_file)
