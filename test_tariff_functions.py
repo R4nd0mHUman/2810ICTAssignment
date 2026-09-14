@@ -390,7 +390,38 @@ def test_tiered_tariff_negative_fixed_fee():
             -10
         )
 
+def test_flat_rate_non_numeric_consumption():
+    """
+    Negative test: Consumption must be a number, not a string.
+    """
+    with pytest.raises(TypeError):
+        calculate_flat_rate("abc", 0.25, 10)
 
+
+def test_flat_rate_non_numeric_rate():
+    """
+    Negative test: Rate must be a number, not None.
+    """
+    with pytest.raises(TypeError):
+        calculate_flat_rate(300, None, 10)
+
+
+def test_flat_rate_zero_rate_and_fee():
+    """
+    Positive boundary test: Zero rate and zero fixed fee should
+    produce a bill of $0.
+    """
+    result = calculate_flat_rate(300, 0, 0)
+    assert result == 0.00
+
+
+def test_flat_rate_large_consumption():
+    """
+    Positive stress test: Very high consumption should still be
+    calculated correctly (no overflow/rounding issues).
+    """
+    result = calculate_flat_rate(1_000_000, 0.25, 10)
+    assert result == 250010.00
 # =========================================================
 # PROVIDED XPOWER DATASET TESTS
 # =========================================================

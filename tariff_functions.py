@@ -164,3 +164,37 @@ def calculate_tiered_tariff(
     total_bill = energy_cost + fixed_fee
 
     return round(total_bill, 2)
+
+def calculate_flat_rate(consumption, rate, fixed_fee=0):
+    """
+    Calculate an electricity bill using a flat rate tariff.
+
+    Parameters:
+    - consumption (float): Electricity consumed in kWh.
+    - rate (float): Price per kWh.
+    - fixed_fee (float): Fixed supply fee.
+
+    Returns:
+    - float: Total electricity bill.
+
+    Raises:
+    - TypeError: If consumption, rate, or fixed_fee is not a number.
+    - ValueError: If consumption, rate, or fixed_fee is negative.
+    """
+    # Type checks first — bool is a subclass of int in Python, so we
+    # explicitly exclude it to stop True/False being treated as 1/0.
+    for name, value in (("consumption", consumption), ("rate", rate), ("fixed_fee", fixed_fee)):
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            raise TypeError(f"{name} must be a number.")
+
+    if consumption < 0:
+        raise ValueError("Consumption cannot be negative.")
+    if rate < 0:
+        raise ValueError("Rate cannot be negative.")
+    if fixed_fee < 0:
+        raise ValueError("Fixed fee cannot be negative.")
+
+    energy_cost = consumption * rate
+    total_bill = energy_cost + fixed_fee
+
+    return round(total_bill, 2)
